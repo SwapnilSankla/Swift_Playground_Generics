@@ -101,35 +101,28 @@ protocol ViewModel {
 
 struct CircleViewModel: ViewModel {
     typealias ItemType = Circle
-    func getAreaDisplayString() -> String {
-        return ItemType(radius: 5).getArea().description
-    }
+    let model: ItemType
+    func getAreaDisplayString() -> String { return model.getArea().description }
 }
 
 struct TriangleViewModel: ViewModel {
     typealias ItemType = Triangle
-    func getAreaDisplayString() -> String {
-        return ItemType(height: 2, base: 5).getArea().description
-    }
+    let model: ItemType
+    func getAreaDisplayString() -> String { return model.getArea().description }
 }
 
 struct Presenter {
-    func getArea<T: ViewModel where T.ItemType: AreaCalculator>(t:T) -> String {
-        return t.getAreaDisplayString()
-    }
+    func getArea<T: ViewModel where T.ItemType: AreaCalculator>(t:T) -> String { return t.getAreaDisplayString() }
 }
 
-struct Controller<T: ViewModel> {
+struct Controller<T: ViewModel where T.ItemType: AreaCalculator> {
     private let presenter = Presenter()
     private let viewModel: T
 
-    func getAreaText() -> String {
-        return ""
-        //return presenter.getArea(viewModel)
-    }
+    func getAreaText() -> String { return presenter.getArea(viewModel) }
 }
 
-let circleController = Controller<CircleViewModel>(viewModel: CircleViewModel())
+let circleController = Controller<CircleViewModel>(viewModel: CircleViewModel(model: Circle(radius: 5)))
 circleController.getAreaText()
-let triangleController = Controller<TriangleViewModel>(viewModel: TriangleViewModel())
+let triangleController = Controller<TriangleViewModel>(viewModel: TriangleViewModel(model: Triangle(height: 2, base: 5)))
 triangleController.getAreaText()
